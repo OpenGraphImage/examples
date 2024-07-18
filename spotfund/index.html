@@ -167,24 +167,29 @@
                   progress,
                   progressPercent: `${progress}%`
                 };
+
+                this.$nextTick(() => {
+                  window.__og.push(['capture', '#opengraph-image']);
+                });
               }
             },
 
             init() {
               window.__og = window.__og || [];
+              
+              // Set the default destination for `link.opengraphimage.com`
+              window.__og.push(['link', 'https://www.spotfund.com']);
 
               if (this.params.path) {
                 this.loadStory(this.params.path);
+              } 
+              else {
+                // Give alpine.js a chance to finish before triggering the render
+                this.$nextTick(() => {
+                  window.__og.push(['ready']);
+                });
               }
 
-              // // Set the default destination for `link.opengraphimage.com`
-              window.__og.push(['link', 'https://www.spotfund.com']);
-
-              // // Give alpine.js a chance to finish before triggering the render
-              this.$nextTick(() => {
-                // window.__og.push(['capture', this.$el]);
-                window.__og.push(['capture', '#opengraph-image']);
-              });
 
             },
           };

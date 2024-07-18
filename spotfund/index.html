@@ -15,7 +15,7 @@
   </head>
   <body class="h-screen">
     <div class="relative flex items-center justify-center w-full h-full bg-neutral-800">
-      <div class="w-[1200px] h-[630px] relative overflow-hidden bg-white" x-data="openGraphImage();">
+      <div id="opengraph-image" class="w-[1200px] h-[630px] relative overflow-hidden bg-white" x-data="openGraphImage();">
         <template x-if="story">
           <a :href="story.url" class="absolute inset-0 p-6">
 
@@ -182,7 +182,8 @@
 
               // // Give alpine.js a chance to finish before triggering the render
               this.$nextTick(() => {
-                window.__og.push(['capture', this.$el]);
+                // window.__og.push(['capture', this.$el]);
+                window.__og.push(['capture', '#opengraph-image']);
               });
 
             },

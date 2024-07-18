@@ -182,7 +182,7 @@
 
               // // Give alpine.js a chance to finish before triggering the render
               this.$nextTick(() => {
-                window.__og.push(['ready']);
+                window.__og.push(['capture', this.$el]);
               });
 
             },

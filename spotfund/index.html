@@ -171,19 +171,19 @@
             },
 
             init() {
-              // window.__og = window.__og || [];
+              window.__og = window.__og || [];
 
               if (this.params.path) {
                 this.loadStory(this.params.path);
               }
 
               // // Set the default destination for `link.opengraphimage.com`
-              // window.__og.push(['link', 'https://www.mywebsite.com']);
+              window.__og.push(['link', 'https://www.spotfund.com']);
 
               // // Give alpine.js a chance to finish before triggering the render
-              // this.$nextTick(() => {
-              //   window.__og.push(['ready']);
-              // });
+              this.$nextTick(() => {
+                window.__og.push(['ready']);
+              });
 
             },
           };

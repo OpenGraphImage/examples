@@ -1,0 +1,202 @@
+<!doctype html>
+<html class="antialiased">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/alpinejs" defer></script>
+  </head>
+  <body class="h-screen">
+    <div class="flex h-full items-center justify-center w-full bg-neutral-800">
+
+      <div class="relative overflow-hidden bg-black w-[1200px] h-[600px] font-twitch" x-data="twitchChannelCard()">
+        <template x-if="channel">
+          <div class="relative w-full h-full border-b-[1rem]" :style="{ borderColor: `#${channel.primaryColorHex}` }">
+      
+            <template x-if="channel.streamPreview">
+              <img
+                :src="channel.streamPreview"
+                class="absolute object-cover w-full h-full"
+              />
+            </template>
+            
+            <div class="absolute bottom-0 left-0 right-0 opacity-75 top-2/3 bg-gradient-to-t from-black to-transparent"></div>
+      
+            <template x-if="channel.stream">
+              <div class="absolute right-6 top-6" x-data="shortNumber(channel.stream.viewersCount)">
+                <div class="flex items-center px-4 py-2 space-x-3 text-3xl text-white bg-red-600 rounded">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                    <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
+                  </svg>
+                  <span x-text="value"></span>
+                </div>
+              </div>
+            </template>
+      
+            <div class="absolute bottom-6 left-6 right-6">
+              <div class="flex justify-between">
+                <div class="flex items-center flex-1 h-full space-x-4">
+                  <div>
+                    <div class="w-32 bg-black rounded-full border-[0.5rem] overflow-hidden"  :style="{ borderColor: `#${channel.primaryColorHex}`, backgroundColor: `#${channel.primaryColorHex}` }">
+                      <img
+                        :src="channel.profileImageURL"
+                        class="object-cover"
+                      />
+                    </div>
+                  </div>
+                  <div class="text-white">
+                    <div class="mb-1 text-6xl font-medium" x-text="channel.displayName">
+                    </div>
+                    <div class="text-2xl">
+                      twitch.tv/<span x-text="channel.displayName"></span>
+                    </div>
+                  </div>
+                </div>
+                <div class="self-end w-16">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 118 138">
+                    <defs/>
+                    <g fill="none" fill-rule="evenodd">
+                      <path fill="#FFF" d="M107.806 63.704L88.204 83.305h-19.6l-17.152 17.151V83.305h-22.05V9.801h78.404z"/>
+                      <path fill="#9146FF" d="M117.605 0v68.605l-44.102 44.099H53.904l-24.503 24.503v-24.503H0V24.502L24.5 0h93.105zm-9.8 9.801H29.401v73.503h22.051v17.15l17.153-17.15h19.601l19.599-19.601V9.801zm-14.7 17.15v29.4h-9.8v-29.4h9.8zm-26.952 0v29.4h-9.8v-29.4h9.8z"/>
+                    </g>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+        </template>
+
+        <template x-if="!channel">
+          <div class="flex items-center justify-center flex-1 h-full bg-[#9146FF]">
+            <div class="w-48 mt-6">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 118 138">
+                <defs/>
+                <g fill="none" fill-rule="evenodd">
+                  <path fill="#FFF" d="M107.806 63.704L88.204 83.305h-19.6l-17.152 17.151V83.305h-22.05V9.801h78.404z"/>
+                  <path fill="#000" d="M117.605 0v68.605l-44.102 44.099H53.904l-24.503 24.503v-24.503H0V24.502L24.5 0h93.105zm-9.8 9.801H29.401v73.503h22.051v17.15l17.153-17.15h19.601l19.599-19.601V9.801zm-14.7 17.15v29.4h-9.8v-29.4h9.8zm-26.952 0v29.4h-9.8v-29.4h9.8z"/>
+                </g>
+              </svg>
+            </div>
+          </div>
+        </template>
+      </div>
+
+    </div>
+
+    <script>
+      document.addEventListener('alpine:init', () => {
+        window.__og = window.__og || [];
+
+        const getParams = () => {
+          const url = new URL(window.location.href);
+          let params = {};
+
+          url.searchParams.forEach((value, key) => {
+            params = {
+              ...params,
+              [key]: value,
+            };
+          });
+
+          return params;
+        };
+
+
+        Alpine.data('twitchChannelCard', function () {
+          const query = `
+            query ($username: String) {
+              user(login: $username) {
+                id
+                isPartner
+                login
+                displayName
+                primaryColorHex
+                offlineImageURL
+                profileImageURL(width: 300)
+                bannerImageURL
+                description
+                stream {
+                  type
+                  viewersCount
+                }
+                lastBroadcast {
+                  title
+                  game {
+                    displayName
+                  }
+                }
+              }
+            }
+          `;
+          
+          return {
+            params: getParams(),
+            get username() {
+              return this.params.username;
+            },
+            channel: null,
+            error: null,
+            async init() {
+              const username = this.username;
+              
+              window.__og.push(['link', `https://www.twitch.tv`]);
+            
+              window.__og.push(['metadata', {
+                displayName: 'Twitch.tv',
+                source: 'twitch.tv',
+                description: 'Twitch is an interactive livestreaming service for content spanning gaming, entertainment, sports, music, and more. There\'s something for everyone on Twitch.'
+              }]);
+          
+              if (username) {
+                let variables = {
+                  username: username.toLowerCase()
+                };
+                let body = JSON.stringify({ query, variables });
+                let response = await fetch('https://gql.twitch.tv/gql', {
+                    method: 'POST',
+                    headers: {
+                      'Client-Id': 'kimne78kx3ncx6brgo4mv6wki5h1ko',
+                      'Content-Type': 'application/json'
+                    },
+                    body,
+                  });
+          
+                let { data } = await response.json();
+                let { user } = data;
+
+                if (user) {
+                  let useOfflineImage = false;
+                  let screenshot = `https://static-cdn.jtvnw.net/previews-ttv/live_user_${variables.username}-1200x676.jpg`;
+                  let { profileImageURL, bannerImageURL, offlineImageURL, stream, primaryColorHex } = user;
+                  let fallbackImage = useOfflineImage ? offlineImageURL : bannerImageURL;
+                  let streamPreview = stream ? screenshot : fallbackImage;
+                  let metadata = {
+                    ...user,
+                    streamPreview,
+                    primaryColorHex: primaryColorHex || '9146FF',
+                    source: 'twitch.tv',
+                  };
+          
+                  window.__og.push(['preload', 'fonts', profileImageURL, streamPreview]);
+                  window.__og.push(['link', `https://www.twitch.tv/${metadata.login}`]);
+                  window.__og.push(['metadata', metadata]);  
+
+                  this.channel = metadata;
+                }
+                else {
+                  this.error = "invalid user";
+                }
+              }
+              
+              this.$nextTick(() => {
+                window.__og.push(['ready']);
+              });
+            }
+          };
+        });
+        
+      });
+    </script>
+  </body>
+</html>

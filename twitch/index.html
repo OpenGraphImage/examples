@@ -9,7 +9,7 @@
   <body class="h-screen">
     <div class="flex h-full items-center justify-center w-full bg-neutral-800">
 
-      <div class="relative overflow-hidden bg-black w-[1200px] h-[630px] font-twitch" x-data="twitchChannelCard()">
+      <div class="relative overflow-hidden bg-black w-[1200px] h-[630px] font-twitch" x-data="twitchChannelCard()" :href="href">
         <template x-if="channel">
           <div class="relative w-full h-full border-b-[1rem]" :style="{ borderColor: `#${channel.primaryColorHex}` }">
       
@@ -132,16 +132,12 @@
           
           return {
             params: getParams(),
-            get username() {
-              return this.params.username;
-            },
+            href: "https://www.twitch.tv",
             channel: null,
             error: null,
             async init() {
-              const username = this.username;
+              const username = this.params.username;
               
-              window.__og.push(['link', `https://www.twitch.tv`]);
-            
               window.__og.push(['metadata', {
                 displayName: 'Twitch.tv',
                 source: 'twitch.tv',
@@ -178,8 +174,9 @@
                     source: 'twitch.tv',
                   };
           
-                  window.__og.push(['preload', 'fonts', profileImageURL, streamPreview]);
-                  window.__og.push(['link', `https://www.twitch.tv/${metadata.login}`]);
+                  this.href = `https://www.twitch.tv/${metadata.login}`;
+                  // window.__og.push(['preload', 'fonts', profileImageURL, streamPreview]);
+                  // window.__og.push(['link', `https://www.twitch.tv/${metadata.login}`]);
                   window.__og.push(['metadata', metadata]);  
 
                   this.channel = metadata;
@@ -190,7 +187,7 @@
               }
               
               this.$nextTick(() => {
-                window.__og.push(['ready']);
+                window.__og.push(['capture', this.$el]);
               });
             }
           };
